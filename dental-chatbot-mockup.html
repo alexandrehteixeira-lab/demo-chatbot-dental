@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot DentalCare Pro - Demonstração em Vídeo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .video-container {
+            max-width: 1200px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .info-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            backdrop-filter: blur(10px);
+            animation: slideInLeft 1s ease;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .phone-mockup {
+            width: 350px;
+            height: 700px;
+            background: #2c3e50;
+            border-radius: 35px;
+            padding: 15px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+            animation: slideInRight 1s ease;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #f8f9fa;
+            border-radius: 25px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .whatsapp-header {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            padding: 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .company-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(45deg, #ffffff, #e3f2fd);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            color: #4facfe;
+            border: 2px solid white;
+        }
+
+        .company-info h3 {
+            font-size: 15px;
+            margin-bottom: 3px;
+        }
+
+        .company-info p {
+            font-size: 11px;
+            opacity: 0.9;
+        }
+
+        .chat-container {
+            height: calc(100% - 75px);
+            background: #e8f4fd;
+            padding: 15px;
+            overflow-y: auto;
+            background-image: linear-gradient(45deg, rgba(79, 172, 254, 0.05) 25%, transparent 25%), 
+                            linear-gradient(-45deg, rgba(79, 172, 254, 0.05) 25%, transparent 25%);
+            background-size: 20px 20px;
+        }
+
+        .message {
+            margin-bottom: 12px;
+            animation: messageSlide 0.6s ease;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .bot-message {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .user-message {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 16px;
+            font-size: 13px;
+            line-height: 1.4;
+            word-wrap: break-word;
+            white-space: pre-line;
+        }
+
+        .bot-message .message-content {
+            background: white;
+            color: #333;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .user-message .message-content {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bot-avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 3px;
+            padding: 10px 14px;
+            background: white;
+            border-radius: 16px;
+            border-bottom-left-radius: 4px;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: #4facfe;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-8px); opacity: 1; }
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .option-button {
+            background: #f0f8ff;
+            border: 1px solid #4facfe;
+            padding: 8px 12px;
+            border-radius: 18px;
+            font-size: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #4facfe;
+        }
+
+        .option-button:hover {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .service-card {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            border-radius: 12px;
+            padding: 12px;
+            margin: 4px 0;
+            color: white;
+            box-shadow: 0 3px 10px rgba(79, 172, 254, 0.3);
+        }
+
+        .appointment-card {
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+            margin: 8px 0;
+            border-left: 4px solid #4facfe;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .price-tag {
+            background: #28a745;
+            color: white;
+            padding: 3px 6px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 10px;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        .info-section {
+            margin-bottom: 25px;
+        }
+
+        .info-section h2 {
+            color: #4facfe;
+            margin-bottom: 12px;
+            font-size: 1.4rem;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            background: #f8f9fa;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 10px;
+            border-left: 4px solid #4facfe;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .feature-icon {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .video-controls {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .control-btn {
+            background: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .timestamp {
+            font-size: 10px;
+            color: rgba(255,255,255,0.7);
+            margin-top: 3px;
+            text-align: right;
+        }
+
+        .bot-message .timestamp {
+            color: #666;
+        }
+
+        .calendar-preview {
+            background: #e8f5e8;
+            border: 2px solid #28a745;
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .available-slot {
+            background: white;
+            padding: 6px 10px;
+            margin: 3px;
+            border-radius: 8px;
+            display: inline-block;
+            font-size: 11px;
+            border: 1px solid #28a745;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .available-slot:hover {
+            background: #28a745;
+            color: white;
+        }
+
+        .dental-logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(79, 172, 254, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .video-timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-family: monospace;
+        }
+
+        @media (max-width: 768px) {
+            .video-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .phone-mockup {
+                width: 100%;
+                max-width: 350px;
+                margin: 0 auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="video-timer" id="videoTimer">00:00</div>
+    
+    <div class="video-container">
+        <div class="info-panel">
+            <div class="dental-logo">🦷</div>
+            
+            <div class="info-section">
+                <h2>🚀 Chatbot DentalCare Pro</h2>
+                <p style="font-size: 1.1rem; color: #666; margin-bottom: 20px;">
+                    Sistema inteligente de atendimento 24/7 para clínicas odontológicas modernas.
+                </p>
+            </div>
+
+            <div class="info-section">
+                <h2>🦷 Especialidades Odontológicas</h2>
+                <ul class="feature-list">
+                    <li>
+                        <div class="feature-icon">🔧</div>
+                        <div>
+                            <strong>Ortodontia Digital</strong><br>
+                            <small>Aparelhos fixos, móveis e invisível</small>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="feature-icon">✨</div>
+                        <div>
+                            <strong>Estética Dental</strong><br>
+                            <small>Clareamento, lentes e facetas</small>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="feature-icon">🦴</div>
+                        <div>
+                            <strong>Implantes</strong><br>
+                            <small>Implantologia avançada e próteses</small>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="feature-icon">🛡️</div>
+                        <div>
+                            <strong>Prevenção</strong><br>
+                            <small>Limpeza, profilaxia e check-ups</small>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="feature-icon">⚡</div>
+                        <div>
+                            <strong>Emergências</strong><br>
+                            <small>Atendimento urgente 24h</small>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="info-section">
+                <h2>📈 Resultados Comprovados</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px;">
+                    <div style="background: #e8f5e8; padding: 18px; border-radius: 12px; text-align: center; border: 2px solid #28a745;">
+                        <div style="font-size: 1.8rem; font-weight: bold; color: #28a745;">+92%</div>
+                        <div>Agendamentos Online</div>
+                    </div>
+                    <div style="background: #fff3e0; padding: 18px; border-radius: 12px; text-align: center; border: 2px solid #ff9800;">
+                        <div style="font-size: 1.8rem; font-weight: bold; color: #ff9800;">-70%</div>
+                        <div>Tempo de Resposta</div>
+                    </div>
+                    <div style="background: #e3f2fd; padding: 18px; border-radius: 12px; text-align: center; border: 2px solid #4facfe;">
+                        <div style="font-size: 1.8rem; font-weight: bold; color: #4facfe;">24/7</div>
+                        <div>Disponibilidade</div>
+                    </div>
+                    <div style="background: #fce4ec; padding: 18px; border-radius: 12px; text-align: center; border: 2px solid #e91e63;">
+                        <div style="font-size: 1.8rem; font-weight: bold; color: #e91e63;">95%</div>
+                        <div>Satisfação</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h2>🎯 Tecnologia Avançada</h2>
+                <div style="background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; padding: 20px; border-radius: 15px;">
+                    <p style="margin-bottom: 10px;"><strong>🤖 IA Especializada:</strong> Treinada especificamente para odontologia</p>
+                    <p style="margin-bottom: 10px;"><strong>📱 Integração Total:</strong> WhatsApp, site e redes sociais</p>
+                    <p><strong>🔒 Segurança:</strong> Dados protegidos conforme LGPD</p>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+
+        <div class="phone-mockup">
+            <div class="phone-screen">
+                <div class="whatsapp-header">
+                    <div class="company-avatar">🦷</div>
+                    <div class="company-info">
+                        <h3>DentalCare Pro</h3>
+                        <p>Online • Assistente Inteligente</p>
+                    </div>
+                </div>
+
+                <div class="chat-container" id="chatContainer">
+                    <!-- Messages will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="video-controls">
+        <button class="control-btn" onclick="resetVideo()" title="Reiniciar Vídeo">
+            🔄
+        </button>
+        <button class="control-btn" onclick="pauseVideo()" title="Pausar/Reproduzir">
+            ⏸️
+        </button>
+    </div>
+
+    <script>
+        const messages = [
+            {
+                type: 'bot',
+                content: 'Olá! 😊 Bem-vindo à DentalCare Pro!\n\nSou sua assistente virtual especializada em odontologia e estou aqui 24 horas para cuidar do seu sorriso!\n\n🦷 Com nossa equipe de especialistas e tecnologia de ponta, oferecemos o melhor em cuidados dentários.\n\nComo posso ajudar você hoje?',
+                options: ['🔧 Ortodontia', '✨ Estética dental', '🦴 Implantes', '🛡️ Limpeza', '⚡ Emergência']
+            },
+            {
+                type: 'user',
+                content: 'Preciso colocar aparelho'
+            },
+            {
+                type: 'bot',
+                content: '🔧 **ORTODONTIA - DENTALCARE PRO**\n\nExcelente escolha! Temos as melhores opções para corrigir seu sorriso:\n\n**🦷 TIPOS DE APARELHO:**\n• Fixo tradicional (metálico)\n• Fixo estético (cerâmico)\n• Autoligado (mais rápido)\n• Invisível (Invisalign)\n• Lingual (por trás dos dentes)\n\n**👨‍⚕️ ORTODONTISTA ESPECIALISTA:**\nDr. Carlos Mendes - 15 anos de experiência\n\nQual tipo desperta seu interesse?'
+            },
+            {
+                type: 'user',
+                content: 'Invisível - Invisalign'
+            },
+            {
+                type: 'bot',
+                content: '✨ **INVISALIGN - ORTODONTIA INVISÍVEL**\n\n🎯 **VANTAGENS EXCLUSIVAS:**\n• 100% invisível - ninguém perceberá\n• Removível para comer e escovar\n• Mais confortável e higiênico\n• Resultados precisos e rápidos\n• Tecnologia 3D avançada\n\n**⏱️ TRATAMENTO:**\n• Duração: 12-18 meses (média)\n• Consultas: mensais\n• Troca de alinhadores: 7-14 dias\n\n**💰 INVESTIMENTO:**\n• Consulta + documentação: R$ 180\n• Tratamento completo: R$ 8.500\n• Parcelamento: até 24x sem juros'
+            },
+            {
+                type: 'bot',
+                content: 'Para seu orçamento personalizado, preciso saber:\n\n• Idade\n• Tipo de problema (dentes tortos, mordida, espaços)\n• Já usou aparelho antes?\n• Preferência de horário para consulta\n• Possui convênio odontológico?\n\n📱 Também podemos agendar uma consulta gratuita para avaliação 3D!'
+            },
+            {
+                type: 'user',
+                content: '28 anos\nDentes um pouco tortos\nNunca usei aparelho\nPrefiro à tarde\nTenho Bradesco Dental'
+            },
+            {
+                type: 'bot',
+                content: '🎉 **PERFEITO PARA INVISALIGN!**\n\n✅ **SEU PERFIL:**\n• Idade ideal para tratamento\n• Caso compatível com alinhadores\n• Primeira ortodontia (excelente!)\n• Convênio aceito (30% cobertura)\n\n👨‍⚕️ **ORTODONTISTA RECOMENDADO:**\nDr. Carlos Mendes - Expert em Invisalign\n🏆 Certificado internacional Align Technology\n\n📅 **HORÁRIOS DISPONÍVEIS ESTA SEMANA:**',
+                isCalendar: true,
+                slots: [
+                    { day: 'Segunda (20/11)', time: '14:00', available: true },
+                    { day: 'Segunda (20/11)', time: '16:30', available: true },
+                    { day: 'Terça (21/11)', time: '15:00', available: true },
+                    { day: 'Quarta (22/11)', time: '14:30', available: true },
+                    { day: 'Quinta (23/11)', time: '16:00', available: true },
+                    { day: 'Sexta (24/11)', time: '15:30', available: true }
+                ]
+            },
+            {
+                type: 'bot',
+                content: 'Qual horário funciona melhor para você? 😊\n\n🎁 **OFERTA ESPECIAL:**\nConsulta + documentação + simulação 3D = **GRATUITA**\n(Economia de R$ 180)\n\n💡 **INCLUSO NA CONSULTA:**\n• Avaliação completa\n• Scan 3D intraoral\n• Simulação do resultado\n• Plano de tratamento detalhado',
+                options: ['Segunda 14:00', 'Segunda 16:30', 'Terça 15:00', 'Quinta 16:00']
+            },
+            {
+                type: 'user',
+                content: 'Terça 15:00'
+            },
+            {
+                type: 'bot',
+                content: '✅ **CONSULTA AGENDADA COM SUCESSO!**\n\n📅 **DETALHES DO AGENDAMENTO:**\n🗓️ Terça-feira, 21/11/2024 - 15:00h\n👨‍⚕️ Dr. Carlos Mendes (Ortodontista)\n🦷 Avaliação para Invisalign\n💰 Valor: GRATUITO (promoção)\n⏱️ Duração: 60 minutos\n🏢 Unidade Centro - Sala 12\n\nPara confirmar, preciso de:\n• Nome completo\n• CPF\n• Telefone\n• E-mail'
+            },
+            {
+                type: 'user',
+                content: 'João Silva Santos\n123.456.789-00\n(47) 99888-7766\njoao.silva@email.com'
+            },
+            {
+                type: 'bot',
+                content: '🎉 **AGENDAMENTO CONFIRMADO!**\n\n📋 **DADOS DA CONSULTA:**\n👤 João Silva Santos\n📅 Terça, 21/11/2024 - 15:00h\n👨‍⚕️ Dr. Carlos Mendes\n🦷 Avaliação Invisalign - GRATUITA\n\n📍 **LOCALIZAÇÃO:**\nDentalCare Pro - Unidade Centro\nRua das Flores, 123 - Sala 12\n🚗 Estacionamento gratuito\n\n📲 **CONFIRMAÇÕES AUTOMÁTICAS:**\n✅ E-mail de confirmação enviado\n✅ SMS com localização\n✅ Lembrete 24h antes\n✅ WhatsApp 2h antes'
+            },
+            {
+                type: 'bot',
+                content: '📋 **ORIENTAÇÕES PRÉ-CONSULTA:**\n\n✅ Traga documento com foto e CPF\n🦷 Escove bem os dentes antes\n📱 Baixe nosso app (link por SMS)\n☕ Evite café 2h antes (para fotos)\n🕐 Chegue 15min antes\n💧 Mantenha-se hidratado\n\n🎯 **O QUE FAREMOS:**\n• Exame clínico completo\n• Scan digital 3D\n• Simulação do seu novo sorriso\n• Plano de tratamento personalizado'
+            },
+            {
+                type: 'bot',
+                content: '🎁 **OFERTAS ESPECIAIS PARA VOCÊ:**\n\n⭐ **COMBO SORRISO PERFEITO:**\nInvisalign + Clareamento LED\n~~R$ 9.200~~ **R$ 7.800** (15% desconto)\n\n✨ **SUPER COMBO:**\nInvisalign + Clareamento + Limpeza trimestral (1 ano)\n~~R$ 9.800~~ **R$ 8.200** (16% desconto)\n\n🔥 **OFERTA RELÂMPAGO:**\nSe fechar hoje após a consulta: + 1 clareamento GRÁTIS!\n\nTem alguma dúvida sobre o tratamento? 😊',
+                options: ['Ver outros tratamentos', 'Informações sobre implantes', 'Alterar horário', 'Finalizar']
+            },
+            {
+                type: 'user',
+                content: 'Ver outros tratamentos'
+            },
+            {
+                type: 'bot',
+                content: '🦷 **TODOS OS TRATAMENTOS - DENTALCARE PRO**\n\nConheça nossa linha completa de cuidados dentários:',
+                isServices: true,
+                services: [
+                    {
+                        name: '✨ Clareamento Dental',
+                        description: 'LED + moldeira personalizada, até 8 tons mais branco',
+                        price: 'R$ 680',
+                        duration: '3 sessões'
+                    },
+                    {
+                        name: '🦴 Implantes Dentários',
+                        description: 'Implante + coroa de porcelana, garantia vitalícia',
+                        price: 'A partir de R$ 2.400',
+                        duration: '3-6 meses'
+                    },
+                    {
+                        name: '💎 Lentes de Contato Dental',
+                        description: 'Porcelana ultrafina, sorriso perfeito em 15 dias',
+                        price: 'R$ 1.200/dente',
+                        duration: '2 consultas'
+                    },
+                    {
+                        name: '🛡️ Limpeza Profissional',
+                        description: 'Remoção de tártaro, polimento e aplicação de flúor',
+                        price: 'R$ 120',
+                        duration: '45min'
+                    }
+                ]
+            },
+            {
+                type: 'bot',
+                content: '🎯 **PACOTES PROMOCIONAIS:**\n\n🌟 **Check-up Anual Completo:**\n4 limpezas + 2 consultas + raio-X panorâmico\n~~R$ 720~~ **R$ 480** (33% desconto)\n\n💫 **Sorriso Hollywoodiano:**\n8 lentes + clareamento + limpeza\n~~R$ 10.800~~ **R$ 8.640** (20% desconto)\n\n🦷 **Reabilitação Total:**\nAvaliação completa + plano personalizado\nCondições especiais para cada caso!\n\nNossa equipe está pronta para transformar seu sorriso! ✨'
+            }
+        ];
+
+        let currentMessageIndex = 0;
+        let isTyping = false;
+        let isPaused = false;
+        let startTime = Date.now();
+        const chatContainer = document.getElementById('chatContainer');
+
+        function updateTimer() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            document.getElementById('videoTimer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function updateProgress() {
+            const progress = (currentMessageIndex / messages.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function addMessage(message, callback) {
+            if (isPaused) {
+                setTimeout(() => addMessage(message, callback), 500);
+                return;
+            }
+
+            if (message.type === 'bot') {
+                showTypingIndicator();
+                setTimeout(() => {
+                    hideTypingIndicator();
+                    addBotMessage(message);
+                    updateProgress();
+                    if (callback) callback();
+                }, 2000 + Math.random() * 1500);
+            } else {
+                addUserMessage(message);
+                updateProgress();
+                if (callback) callback();
+            }
+        }
+
+        function showTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot-message typing-indicator';
+            typingDiv.id = 'typing';
+            typingDiv.innerHTML = `
+                <div class="bot-avatar">🦷</div>
+                <div class="typing-dots">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            `;
+            chatContainer.appendChild(typingDiv);
+            setTimeout(() => {
+                typingDiv.style.opacity = '1';
+            }, 100);
+            scrollToBottom();
+        }
+
+        function hideTypingIndicator() {
+            const typing = document.getElementById('typing');
+            if (typing) {
+                typing.remove();
+            }
+        }
+
+        function addBotMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot-message';
+            
+            let content = `
+                <div class="bot-avatar">🦷</div>
+                <div>
+                    <div class="message-content">${message.content}</div>
+            `;
+
+            if (message.isCalendar && message.slots) {
+                content += '<div class="calendar-preview">';
+                content += '<div style="font-weight: bold; margin-bottom: 10px;">📅 Horários Disponíveis</div>';
+                message.slots.forEach(slot => {
+                    content += `<div class="available-slot">${slot.day} - ${slot.time}</div>`;
+                });
+                content += '</div>';
+            }
+
+            if (message.isServices && message.services) {
+                content += '<div style="margin-top: 10px;">';
+                message.services.forEach(service => {
+                    content += `
+                        <div class="service-card">
+                            <strong>${service.name}</strong><br>
+                            ${service.description}<br>
+                            ⏱️ ${service.duration} | <span class="price-tag">${service.price}</span>
+                        </div>
+                    `;
+                });
+                content += '</div>';
+            }
+
+            if (message.options) {
+                content += '<div class="options-grid">';
+                message.options.forEach(option => {
+                    content += `<div class="option-button">${option}</div>`;
+                });
+                content += '</div>';
+            }
+
+            content += `
+                    <div class="timestamp">${new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})}</div>
+                </div>
+            `;
+
+            messageDiv.innerHTML = content;
+            chatContainer.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        function addUserMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message user-message';
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    ${message.content}
+                    <div class="timestamp">${new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})}</div>
+                </div>
+            `;
+            chatContainer.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function nextMessage() {
+            if (currentMessageIndex < messages.length && !isTyping) {
+                isTyping = true;
+                addMessage(messages[currentMessageIndex], () => {
+                    isTyping = false;
+                    currentMessageIndex++;
+                    if (currentMessageIndex < messages.length) {
+                        setTimeout(nextMessage, 2500 + Math.random() * 2000);
+                    }
+                });
+            }
+        }
+
+        function resetVideo() {
+            currentMessageIndex = 0;
+            isTyping = false;
+            isPaused = false;
+            startTime = Date.now();
+            chatContainer.innerHTML = '';
+            document.getElementById('progressBar').style.width = '0%';
+            setTimeout(nextMessage, 1500);
+        }
+
+        function pauseVideo() {
+            isPaused = !isPaused;
+            const pauseBtn = document.querySelector('.control-btn[onclick="pauseVideo()"]');
+            pauseBtn.textContent = isPaused ? '▶️' : '⏸️';
+        }
+
+        // Add interactive elements
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('option-button')) {
+                e.target.style.background = 'linear-gradient(135deg, #4facfe, #00f2fe)';
+                e.target.style.color = 'white';
+                e.target.style.transform = 'translateY(-2px)';
+                setTimeout(() => {
+                    e.target.style.background = '#f0f8ff';
+                    e.target.style.color = '#4facfe';
+                    e.target.style.transform = 'translateY(0)';
+                }, 1500);
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('available-slot')) {
+                e.target.style.background = '#28a745';
+                e.target.style.color = 'white';
+                e.target.textContent += ' ✓ Selecionado';
+                setTimeout(() => {
+                    document.querySelectorAll('.available-slot').forEach(slot => {
+                        if (slot !== e.target) {
+                            slot.style.opacity = '0.4';
+                        }
+                    });
+                }, 500);
+            }
+        });
+
+        // Timer update interval
+        setInterval(updateTimer, 1000);
+
+        // Start the video simulation
+        setTimeout(nextMessage, 2000);
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'r' || e.key === 'R') {
+                resetVideo();
+            }
+            if (e.key === ' ') {
+                e.preventDefault();
+                pauseVideo();
+            }
+        });
+
+        // Add floating animations
+        function addFloatingAnimation() {
+            const elements = document.querySelectorAll('.feature-icon, .bot-avatar, .dental-logo');
+            elements.forEach((element, index) => {
+                element.style.animation = `float 3s ease-in-out ${index * 0.5}s infinite`;
+            });
+        }
+
+        // Add floating keyframes
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes float {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-5px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        setTimeout(addFloatingAnimation, 1000);
+    </script>
+</body>
+</html>
